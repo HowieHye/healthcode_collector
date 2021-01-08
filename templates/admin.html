@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>17电信1班 行程轨迹管理</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/HowieHye/StaticFile/healthcode/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HowieHye/StaticFile/healthcode/theme.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="all"
+    onload="this.media=&quot;all&quot;">
+  <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/HowieHye/CDN@latest/blog/favicon.ico">
+  <meta charset="UTF-8">
+  <style type="text/css">
+    .imgs {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      flex-direction: row;
+      flex-wrap: wrap;
+      padding: 5px 5px;
+    }
+
+    .imgs .imgItem {
+      width: 260px;
+      height: 500px;
+      margin: 20px 5px;
+    }
+
+    .imgs .imgSize img {
+      width: 260px;
+      height: 500px;
+      background-size: 100%;
+      border: 1px solid #ccc;
+    }
+
+    footer {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .copyright:before {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 0.8rem;
+      background: #49b1f5;
+      text-align: center;
+      content: '';
+    }
+
+    .copyright:after {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 0.4rem;
+      background: #ffffff;
+      text-align: center;
+      content: '';
+    }
+
+    #app {
+      margin: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <el-row>
+    <el-col id="dialog">
+      <el-form :label-position="'left'">
+        <el-form-item>
+          <h1 style="text-align: center">17电信1班 行程轨迹管理</h1>
+        </el-form-item>
+        <el-form-item>
+          <h6 style="text-align: center">If you have any questions ,please contact me with email howiehye@163.com</h6>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+  <div id="app">
+    <div style="text-align: center">
+      <a class="site-page" href="javascript:void(0)" v-on:click="download">
+        <i class="fas fa-download"></i>
+        <span>下载压缩包</span>
+      </a>
+      <a class="site-page" href="javascript:void(0)" v-on:click="myconfirm_delete()">
+        <i class="fas fa-trash-alt"></i>
+        <span>删除残留文件</span>
+      </a>
+      <a class="site-page" href="javascript:void(0)" v-on:click="myconfirm_send_email()">
+        <i class="fas fa-envelope"></i>
+        <span>发送邮件</span>
+      </a>
+      <a class="site-page" href="/">
+        <i class="fas fa-home"></i>
+        <span>返回主页</span>
+      </a>
+    </div>
+    <div v-if="tableData.length === 0">
+      <h3 style="display:block;margin:0 auto;text-align: center">还没有人提交喔！快去催一催吧！</h3>
+    </div>
+    <div v-else class="imgs">
+      <div v-for="item in tableData" class="imgItem" @click="imgZoomIn(item.img_path);">
+        <div class="imgSize">
+          <img :src="item.img_path" alt="item.img_name">
+          <h5 style="text-align: center">{{ item.img_name }}</h5>
+        </div>
+      </div>
+    </div>
+    <!--图片放大 模态框（Modal） -->
+    <div class="modal fade text-center" id="imgZoomInModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" style="display: inline-block; width: auto;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+          </div>
+          <div class="modal-body">
+            <img src="" id="pigImg" style="width: 100%; height: 100%" />
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <footer id="footer">
+    <div class="copyright">@2020 By <a href="https://github.com/HowieHye">Howie Hye</a> & <a
+        href="https://github.com/Daisy-1999">Daisy-1999</a>
+    </div>
+    <div class="icp">
+      <a target="_blank" rel="noopener external nofollow noreferrer" href="https://beian.miit.gov.cn/"><img
+          class="icp-icon" src="/static/images/icp.png" alt="ICP"><span>苏ICP备20045438号-1</span></a>
+    </div>
+  </footer>
+</body>
+
+<script>
+  BASE = window.location.origin;
+  vm = new Vue({
+    el: '#app',
+    data: {
+      tableData: [],
+    },
+    created: function () {
+      var self = this
+      axios.get("/view").then(function (response) {
+        self.tableData = response.data;
+        console.log(response.data)
+      })
+      //console.log('123')
+    },
+    methods: {
+      //点击查看原图
+      imgZoomIn(src) {
+        $("#pigImg").attr('src', src);
+        $("#imgZoomInModal").modal("show");
+      },
+      download() {
+        axios.get("/download").then(res => {
+          if (res.code == null || res.code === 0) {
+            console.log(res)
+            window.location.href = BASE + res.data
+          } else {
+            this.$message.error(res.msg || res.message || '失败')
+          }
+        }).catch((err) => {
+          this.$message.error(err.message || '失败')
+        })
+        this.timer = setTimeout(() => {
+          console.log('test');
+        })
+      },
+      delete_files() {
+        axios.get("/delete").then(res => {
+          if (res.code == null || res.code === 0) {
+            console.log(res);
+            this.$message({
+              message: '已经删除所有残留截图😂再见',
+              type: 'success'
+            });
+          } else {
+            this.$message.error(res.msg || res.message || '失败')
+          }
+        }).catch((err) => {
+          this.$message.error(err.message || '失败')
+        })
+        setTimeout(this.refresh, 1000 * 3);
+      },
+      send_email() {
+        axios.get("/send_email").then(res => {
+          console.log(res);
+          if (res.code == null || res.code === 0) {
+            console.log(res.data)
+            this.$message({
+              message: '成功发送邮件😂再见',
+              type: 'success'
+            });
+          } else {
+            this.$message.error(res.msg || res.message || '失败')
+          }
+        }).catch((err) => {
+          this.$message.error(err.message || '失败')
+        })
+      },
+      jump() {
+        axios.get("/").then(res => {
+          console.log('return to index');
+        })
+      },
+      myconfirm_delete() {
+        this.$confirm('确定要删除吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.delete_files()
+        }).catch(() => {
+          this.$message.error('已取消删除')
+        })
+      },
+      myconfirm_send_email() {
+        this.$confirm('确定要发送邮件吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.send_email()
+        }).catch(() => {
+          this.$message.error('已取消删除')
+        })
+      },
+      refresh() {
+        window.location.href = '/admin';
+      }
+    }
+  })
+</script>
+
+</html>
