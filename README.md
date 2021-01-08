@@ -88,3 +88,7 @@ def send_email():
 
 - [xrandx](https://github.com/xrandx)
 - [Daisy-1999](https://github.com/Daisy-1999)
+
+## LICENSE
+
+[GPL v3.0](./LICENSE)
