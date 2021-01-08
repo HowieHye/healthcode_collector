@@ -50,7 +50,7 @@ def send_email():
             myzip.write(file)
     chdir(PROGRAM_DIR + "static")
 -     email_subject = datetime.date.today().strftime("%m月%d日") + "17电信1班 行程轨迹"
-    msg = Message(email_subject, sender='howiehye@qq.com',
+-     msg = Message(email_subject, sender='howiehye@qq.com',
                   recipients=['howiehye@163.com'])
     msg.body = email_subject
     SendFileName = PROGRAM_DIR+"static/"+compressed_file
